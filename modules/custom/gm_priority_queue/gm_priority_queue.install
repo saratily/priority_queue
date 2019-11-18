@@ -1,0 +1,64 @@
+<?php
+
+/**
+ * @file
+ * Define database schema to store alert reports data.
+ */
+
+declare(strict_types = 1);
+
+/**
+ * Implements hook_schema().
+ */
+function gm_priority_queue_schema() {
+
+  $schema['submitter'] = [
+    'description' => 'Information about submitter.',
+    'fields' => [
+      'id' => [
+        'description' => 'ID',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ],
+      'name' => [
+        'description' => 'Name of the submitter.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ],
+    ],
+    'primary key' => [
+      'id',
+    ],
+  ];
+
+  $schema['processor'] = [
+    'description' => 'Information about processor.',
+    'fields' => [
+      'id' => [
+        'description' => 'ID',
+        'type' => 'serial',
+        'not null' => TRUE,
+      ],
+      'name' => [
+        'description' => 'Name of the processor.',
+        'type' => 'varchar',
+        'length' => 255,
+        'not null' => TRUE,
+      ],
+      'status' => [
+        'description' => 'Available or not',
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'default' => 1,
+        'size' => 'tiny',
+      ],
+    ],
+    'primary key' => [
+      'id',
+    ],
+  ];
+
+  return $schema;
+}

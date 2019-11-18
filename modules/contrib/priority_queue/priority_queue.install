@@ -1,0 +1,65 @@
+<?php
+
+/**
+ * @file
+ * Define database schema to store alert reports data.
+ */
+
+declare(strict_types = 1);
+
+/**
+ * Implements hook_schema().
+ */
+function priority_queue_schema() {
+  $schema['queue_priority'] = [
+    'description' => 'Stores items in priority queues.',
+    'fields' => [
+      'item_id' => [
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE,
+        'description' => 'Primary Key: Unique item ID.',
+      ],
+      'name' => [
+        'type' => 'varchar_ascii',
+        'length' => 255,
+        'not null' => TRUE,
+        'default' => '',
+        'description' => 'The queue name.',
+      ],
+      'data' => [
+        'type' => 'blob',
+        'not null' => FALSE,
+        'size' => 'big',
+        'serialize' => TRUE,
+        'description' => 'The arbitrary data for the item.',
+      ],
+      'priority' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'The priority of the queued item. Items with higher priorities will be processed first.',
+      ],
+      'expire' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Timestamp when the claim lease expires on the item.',
+      ],
+      'created' => [
+        'type' => 'int',
+        'not null' => TRUE,
+        'default' => 0,
+        'description' => 'Timestamp when the item was created.',
+      ],
+    ],
+    'primary key' => ['item_id'],
+    'indexes' => [
+      'name_created' => ['name', 'created'],
+      'name_priority' => ['name', 'priority', 'created'],
+      'expire' => ['expire'],
+    ],
+  ];
+
+  return $schema;
+}

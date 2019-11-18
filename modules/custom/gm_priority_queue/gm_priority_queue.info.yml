@@ -1,0 +1,7 @@
+name: GluMobile Priority Queue
+type: module
+description: Provides a customized priority queue implementation.
+core: 8.x
+package: GluMobile
+dependencies:
+  - priority_queue

@@ -1,0 +1,54 @@
+# Submit a new submitter.
+gm_priority_queue.add_submitter:
+  path: '/task/add_submitter'
+  defaults:
+    _form: '\Drupal\gm_priority_queue\Form\SubmitterForm'
+    _title: 'Add Submitter'
+  requirements:
+    _permission: 'access content'
+
+# Submit a new submitter.
+gm_priority_queue.add_processor:
+  path: '/task/add_processor'
+  defaults:
+    _form: '\Drupal\gm_priority_queue\Form\ProcessorForm'
+    _title: 'Add Processor'
+  requirements:
+    _permission: 'access content'
+
+# Get a list of tasks.
+gm_priority_queue.list_task:
+  path: '/task/list'
+  defaults:
+    _controller: '\Drupal\gm_priority_queue\Controller\TaskController::list'
+    _title: 'Task List'
+  requirements:
+    _permission: 'access content'
+
+# Get the status of the task with id = $id
+gm_priority_queue.task:
+  path: '/task/{id}'
+  defaults:
+    _form: '\Drupal\gm_priority_queue\Form\TaskForm'
+    _title: 'Task'
+    id: \d+
+  requirements:
+    _permission: 'access content'
+
+# Get the next available task with highest priority.
+gm_priority_queue.task_detail:
+  path: '/task/view/{id}'
+  defaults:
+    _controller: '\Drupal\gm_priority_queue\Controller\TaskController::getTask'
+    _title: 'Task Details'
+    id: \d+
+  requirements:
+    _permission: 'access content'
+
+# Get a list of tasks.
+gm_priority_queue.process_task:
+  path: '/task/process'
+  defaults:
+    _controller: '\Drupal\gm_priority_queue\Controller\TaskController::processTask'
+  requirements:
+    _permission: 'access content'

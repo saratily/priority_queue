@@ -1,0 +1,8 @@
+services:
+  queue.gm_priority_queue:
+    class: Drupal\gm_priority_queue\Queue\TaskQueue
+    arguments: ['@database', '@queue.priority_queue']
+
+  gm_priority_queue.processor:
+    class: \Drupal\gm_priority_queue\TaskQueueProcessor
+    arguments: ['@database', '@queue.priority_queue']
