@@ -85,24 +85,27 @@ class TaskController extends ControllerBase {
       "</div>";
 
     $task_link = "<div>" . Link::fromTextAndUrl('ADD TASK',
-      Url::fromRoute('gm_priority_queue.task'))->toString() .
+        Url::fromRoute('gm_priority_queue.task'))->toString() .
       "</div>";
 
     $submitter_link = "<div>" . Link::fromTextAndUrl('ADD SUBMITTER',
-      Url::fromRoute('gm_priority_queue.add_submitter'))->toString() .
+        Url::fromRoute('gm_priority_queue.add_submitter'))->toString() .
       "</div>";
 
     $processor_link = "<div>" . Link::fromTextAndUrl('ADD PROCESSOR',
-      Url::fromRoute('gm_priority_queue.add_processor'))->toString() .
+        Url::fromRoute('gm_priority_queue.add_processor'))->toString() .
       "</div>";
 
+    $avg_time = $this->getAverageTime();
     $build['intro'] = [
       '#type' => 'markup',
       '#prefix' => '<p>' . $processor. $task_link . $submitter_link . $processor_link,
       '#suffix' => '</p>',
       '#markup' => $this->t(
-        'The following table lists the @count items waiting to be processed.',
-        ['@count' => count($rows)]
+        'The following table lists the @count items waiting to be processed.<br />' .
+        'The average processing time is: @avg_time seconds',
+        ['@count' => count($rows),
+          '@avg_time' => $avg_time]
       ),
     ];
 
@@ -172,13 +175,13 @@ class TaskController extends ControllerBase {
       '#type' => 'markup',
       '#markup' => $this->t("$back_link<br />$edit_link <br />
       Item ID: " . $item->item_id . "<br />" .
-      "Submitter ID:" . $this->getSubmitter($sid) . " ($sid)<br />" .
-      "Command: " . $data->getCommand() ."<br />" .
-      "Priority: " . $item->priority ."<br />" .
-      "Status: " . $data->getStatus() . "<br />" .
-      "Start Time: " . $data->getStartTime() . "<br />" .
-      "End Time: " . $data->getEndTime() . "<br />" .
-      "Processing Time: " . $data->getProcessingTime()
+        "Submitter ID:" . $this->getSubmitter($sid) . " ($sid)<br />" .
+        "Command: " . $data->getCommand() ."<br />" .
+        "Priority: " . $item->priority ."<br />" .
+        "Status: " . $data->getStatus() . "<br />" .
+        "Start Time: " . $data->getStartTime() . "<br />" .
+        "End Time: " . $data->getEndTime() . "<br />" .
+        "Processing Time: " . $data->getProcessingTime()
       ),
     ];
 
@@ -213,6 +216,37 @@ class TaskController extends ControllerBase {
     $result = $query->execute()->fetchAllAssoc('id');
 
     return isset($result[$id]->name) ? $result[$id]->name : '';
+
+  }
+
+
+  /**
+   * Returns average processing time.
+   *
+   * @return float|int
+   */
+  private function getAverageTime() {
+    $query = $this->database->select('queue_priority', 'q');
+    $query->fields('q');
+    $or_condition = $query->orConditionGroup();
+    $or_condition->condition('expire', time(), '>=');
+    $or_condition->condition('expire', 0, '!=');
+    $query->condition($or_condition);
+    $query->orderBy('priority','ASC');
+    $results = $query->execute()->fetchAllAssoc('item_id');
+
+    $sum = 0;
+    $count = 0;
+
+    foreach ($results as $item) {
+
+      /** @var \Drupal\gm_priority_queue\Queue\TaskQueueData $data */
+      $data = unserialize($item->data);
+      $sum += $data->getProcessingTime();
+      $count++;
+    }
+
+    return $sum/$count;
 
   }
 

@@ -56,6 +56,7 @@ class TaskQueueProcessor {
 
       $task = $this->queue->claimItem();
       /** @var \Drupal\gm_priority_queue\Queue\TaskQueueData $data */
+      $task_id = (int) $task->item_id;
       $data = $task->data;
 
       // No task in the queue.
@@ -63,7 +64,7 @@ class TaskQueueProcessor {
         return;
       }
 
-      $thread = new TaskThread($this->database, $pid, $data);
+      $thread = new TaskThread($this->database, $pid, $task_id, $data);
       $thread->run();
     }
 
@@ -76,6 +77,11 @@ class TaskQueueProcessor {
 
   }
 
+  /**
+   * Get list of available processor.
+   *
+   * @return array
+   */
   private function getProcessor() {
 
     $query = $this->database->select('processor', 'p');
@@ -85,5 +91,6 @@ class TaskQueueProcessor {
 
     return isset($result) ? $result : [];
   }
+
 
 }
